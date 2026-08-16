@@ -1,0 +1,21 @@
+name: 04-variable-precedence
+on: workflow_dispatch
+env:
+    APPLICATION_NAME: i27-app-workflow
+jobs:
+    dev-job:
+        runs-on: ubuntu-latest
+        env:
+            APPLICATION_NAME: i27-app-job-level
+        steps:
+            - name: Print Env Variables
+              env:
+                  APPLICATION_NAME: i27-app-step-level
+              run:
+                echo "Application name is :$APPLICATION_NAME"
+# Step level variable overrides 
+#Step Variable
+#    ↓
+#Job Variable
+#    ↓
+#Workflow Variable

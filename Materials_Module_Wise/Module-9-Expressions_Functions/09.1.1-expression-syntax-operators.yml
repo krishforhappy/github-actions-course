@@ -1,0 +1,49 @@
+name: 09.1.1-Expression-Syntax-Operators
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [ development, staging, production ]
+        default: development
+
+jobs:
+  operators-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comparison operators
+        run: |
+          echo "============================="
+          echo "COMPARISON OPERATORS"
+          echo "============================="
+          echo "ref_name == main     : ${{ github.ref_name == 'main' }}"
+          echo "ref_name != main     : ${{ github.ref_name != 'main' }}"
+          echo "run_number > 0       : ${{ github.run_number > 0 }}"
+          echo "============================="
+
+      - name: Logical operators
+        run: |
+          echo "============================="
+          echo "LOGICAL OPERATORS"
+          echo "============================="
+          echo "push AND main        : ${{ github.event_name == 'push' && github.ref_name == 'main' }}"
+          echo "push OR dispatch     : ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}"
+          echo "NOT push             : ${{ !(github.event_name == 'push') }}"
+          echo "============================="
+
+      - name: Conditional step using ==
+        if: inputs.environment == 'production'
+        run: echo "Production step runs ✅"
+
+      - name: Conditional step using !=
+        if: inputs.environment != 'production'
+        run: echo "Non-production step runs ✅"
+
+      - name: Conditional step using &&
+        if: github.event_name == 'workflow_dispatch' && inputs.environment == 'staging'
+        run: echo "Manual staging deployment ✅"
+
+      - name: Conditional step using ||
+        if: inputs.environment == 'development' || inputs.environment == 'staging'
+        run: echo "Lower environment step runs ✅"

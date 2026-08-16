@@ -1,0 +1,52 @@
+name: 08.1.4-Context-Steps-Needs
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  job-one:
+    name: Job One
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.compute.outputs.value }}
+    steps:
+      - name: Compute a value
+        id: compute
+        run: |
+          echo "value=i27academy-build-${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "Value computed"
+
+      - name: Print steps.* context
+        run: |
+          echo "============================="
+          echo "steps.* CONTEXT"
+          echo "============================="
+          echo "compute output : ${{ steps.compute.outputs.value }}"
+          echo "compute result : ${{ steps.compute.outcome }}"
+          echo "============================="
+          echo "outcome values: success, failure, skipped, cancelled"
+
+  job-two:
+    name: Job Two
+    runs-on: ubuntu-latest
+    needs: job-one
+    steps:
+      - name: Print needs.* context
+        run: |
+          echo "============================="
+          echo "needs.* CONTEXT"
+          echo "============================="
+          echo "job-one result  : ${{ needs.job-one.result }}"
+          echo "job-one output  : ${{ needs.job-one.outputs.result }}"
+          echo "============================="
+          echo "result values: success, failure, skipped, cancelled"
+
+      - name: Dump needs context
+        env:
+          NEEDS_CONTEXT: ${{ toJson(needs) }}
+        run: |
+          echo "============================="
+          echo "FULL NEEDS CONTEXT (JSON)"
+          echo "============================="
+          echo "$NEEDS_CONTEXT"

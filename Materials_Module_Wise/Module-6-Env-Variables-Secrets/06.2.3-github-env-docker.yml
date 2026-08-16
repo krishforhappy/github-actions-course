@@ -1,0 +1,13 @@
+name: 07-github-env-docker-example
+on: workflow_dispatch
+jobs:
+    create_docker_image_job:
+      name: Create Docker Tag Job
+      runs-on:  ubuntu-latest
+      steps:
+      - name: Create Docker Tag
+        run: |
+          echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Build Docker Image
+        run: |
+          echo "Docker Build Image is: i27academy:$IMAGE_TAG"

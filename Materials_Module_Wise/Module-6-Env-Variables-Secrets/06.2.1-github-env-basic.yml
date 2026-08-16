@@ -1,0 +1,26 @@
+name: 05-github-env
+on: workflow_dispatch
+jobs:
+  github-env-demo:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set Variable
+      run: |
+        echo "APP_VERSION=1.0" >> $GITHUB_ENV
+        echo "NAME=Siva" >> $GITHUB_ENV
+        echo "Trying to print APP_VERSION and NAME in the same step"
+        echo "******************************"
+        echo $APP_VERSION
+        echo $NAME
+# Variable becomes available ONLY in subsequent steps, not in the same step.
+    - name: Use Variable
+      run: |
+        echo "Application Version is $APP_VERSION"
+        echo "Name is: $NAME"
+
+# Linux:            echo "APP_NAME=i27Academy" >> $GITHUB_ENV
+# Windows PowerShell: "APP_NAME=i27Academy" >> $env:GITHUB_ENV
+# env       → known before workflow starts (static)
+# GITHUB_ENV → dynamic, created during workflow execution
+# GITHUB_ENV is a special file provided by GitHub Actions that allows
+# environment variables to be shared between steps within the same job.

@@ -1,0 +1,17 @@
+name: 08-Dynamic-Env
+on: workflow_dispatch
+jobs:
+    print-job:
+      name: Print Job Based on Branch
+      runs-on:  ubuntu-latest
+      steps:
+      - name: Determine the Env 
+        run: |
+          if ["${{ github.ref_name }}" = "main"]; then
+            echo "BranchName=main" >> $GITHUB_ENV
+          else
+            echo "BranchName=Other"  >> $GITHUB_ENV
+          fi
+      - name: Print Environment 
+        run: |
+            echo "Branch Deployed is $BranchName Branch"

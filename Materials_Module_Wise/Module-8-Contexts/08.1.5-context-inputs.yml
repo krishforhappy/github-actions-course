@@ -1,0 +1,62 @@
+name: 08.1.5-Context-Inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+        default: development
+      version:
+        description: Version to deploy
+        required: false
+        type: string
+        default: 'v1.0.0'
+      skip-tests:
+        description: Skip tests?
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  inputs-context-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print inputs.* context
+        run: |
+          echo "============================="
+          echo "inputs.* CONTEXT"
+          echo "============================="
+          echo "Environment : ${{ inputs.environment }}"
+          echo "Version     : ${{ inputs.version }}"
+          echo "Skip Tests  : ${{ inputs.skip-tests }}"
+          echo "============================="
+
+      - name: Use inputs in conditions
+        if: inputs.environment == 'production'
+        run: echo "Running production steps ✅"
+
+      - name: Skip tests if requested
+        if: inputs.skip-tests == false
+        run: echo "Running tests — skip-tests is false"
+
+      - name: Dump inputs context
+        env:
+          INPUTS_CONTEXT: ${{ toJson(inputs) }}
+        run: |
+          echo "============================="
+          echo "FULL INPUTS CONTEXT (JSON)"
+          echo "============================="
+          echo "$INPUTS_CONTEXT"
+
+# ════════════════════════════════════════════════════════════
+# inputs.* context:
+#   → only available when triggered by workflow_dispatch
+#     or workflow_call
+#   → for workflow_call inputs use inputs.* the same way
+# ════════════════════════════════════════════════════════════

@@ -1,0 +1,58 @@
+name: 09.2.1-String-Functions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  string-functions-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: contains()
+        run: |
+          echo "============================="
+          echo "contains()"
+          echo "============================="
+          echo "ref contains main        : ${{ contains(github.ref, 'main') }}"
+          echo "repo contains i27academy  : ${{ contains(github.repository, 'i27academy') }}"
+          echo "actor contains a         : ${{ contains(github.actor, 'a') }}"
+          echo "============================="
+
+      - name: Use contains() in condition
+        if: contains(github.repository, 'i27academy')
+        run: echo "Repository belongs to i27academy ✅"
+
+      - name: startsWith()
+        run: |
+          echo "============================="
+          echo "startsWith()"
+          echo "============================="
+          echo "ref starts with refs/heads : ${{ startsWith(github.ref, 'refs/heads') }}"
+          echo "ref starts with refs/tags  : ${{ startsWith(github.ref, 'refs/tags') }}"
+          echo "ref_name starts with main  : ${{ startsWith(github.ref_name, 'main') }}"
+          echo "============================="
+
+      - name: endsWith()
+        run: |
+          echo "============================="
+          echo "endsWith()"
+          echo "============================="
+          echo "repo ends with dashboard   : ${{ endsWith(github.repository, 'dashboard') }}"
+          echo "repo ends with private     : ${{ endsWith(github.repository, 'private') }}"
+          echo "============================="
+
+      - name: format()
+        run: |
+          echo "============================="
+          echo "format()"
+          echo "============================="
+          echo "${{ format('Actor: {0} | Branch: {1} | Run: {2}', github.actor, github.ref_name, github.run_number) }}"
+          echo "${{ format('Image: devopswithcloudhub/i27academy:{0}', github.sha) }}"
+          echo "============================="
+
+      - name: join()
+        run: |
+          echo "============================="
+          echo "join()"
+          echo "============================="
+          echo "${{ join(github.event.commits.*.message, ', ') }}"
+          echo "============================="

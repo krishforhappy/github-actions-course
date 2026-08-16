@@ -1,0 +1,17 @@
+name: 03-step-level-env
+on: workflow_dispatch
+jobs:
+  dev-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Variables
+        env:
+          ENVIRONMENT: dev
+          APP_NAME: helpdesk
+        run: |
+          echo "Application Name is: $APP_NAME"
+          echo "Environment is: $ENVIRONMENT"
+      - name: Print Variables Other
+        run: |
+          echo "Application Name is: $APP_NAME"
+          echo "Environment is: $ENVIRONMENT"

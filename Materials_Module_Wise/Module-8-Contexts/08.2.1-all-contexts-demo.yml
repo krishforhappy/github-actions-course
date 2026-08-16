@@ -1,0 +1,59 @@
+name: 08.2.1-All-Contexts-Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [ development, staging, production ]
+        default: development
+
+env:
+  APP_NAME: i27academy-devops-dashboard
+
+jobs:
+  all-contexts:
+    name: All Contexts Demo
+    runs-on: ubuntu-latest
+    steps:
+      - name: github.* context
+        run: |
+          echo "repository  : ${{ github.repository }}"
+          echo "ref_name    : ${{ github.ref_name }}"
+          echo "sha         : ${{ github.sha }}"
+          echo "actor       : ${{ github.actor }}"
+          echo "event_name  : ${{ github.event_name }}"
+          echo "run_number  : ${{ github.run_number }}"
+
+      - name: runner.* context
+        run: |
+          echo "os          : ${{ runner.os }}"
+          echo "arch        : ${{ runner.arch }}"
+          echo "name        : ${{ runner.name }}"
+
+      - name: env.* context
+        run: |
+          echo "APP_NAME    : ${{ env.APP_NAME }}"
+
+      - name: vars.* context
+        run: |
+          echo "DEPLOY_ENV  : ${{ vars.DEPLOY_ENV }}"
+
+      - name: secrets.* context
+        run: |
+          echo "MY_SECRET   : ${{ secrets.MY_SECRET }}"
+          echo "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN != '' }}"
+
+      - name: inputs.* context
+        run: |
+          echo "environment : ${{ inputs.environment }}"
+
+      - name: Set step output for steps.* demo
+        id: my-step
+        run: echo "value=step-output-value" >> $GITHUB_OUTPUT
+
+      - name: steps.* context
+        run: |
+          echo "my-step output  : ${{ steps.my-step.outputs.value }}"
+          echo "my-step outcome : ${{ steps.my-step.outcome }}"

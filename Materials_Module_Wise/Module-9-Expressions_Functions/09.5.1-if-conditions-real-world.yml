@@ -1,0 +1,62 @@
+name: 09.5.1-If-Conditions-Real-World
+
+on:
+  push:
+    branches: [ main, develop, 'release/**' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [ development, staging, production ]
+        default: development
+
+jobs:
+  real-world-conditions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only on main branch
+        if: github.ref_name == 'main'
+        run: echo "Running on main branch ✅"
+
+      - name: Only on push to main
+        if: github.event_name == 'push' && github.ref_name == 'main'
+        run: echo "Push to main ✅"
+
+      - name: Only on version tags
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: echo "Version tag detected ✅"
+
+      - name: Only on release branches
+        if: startsWith(github.ref_name, 'release/')
+        run: echo "Release branch ✅"
+
+      - name: Skip when commit message has skip-ci
+        if: "!contains(github.event.head_commit.message, '[skip-ci]')"
+        run: echo "Running — no skip-ci in commit message ✅"
+
+      - name: Only for valid environments
+        if: contains(fromJson('["development","staging","production"]'), inputs.environment)
+        run: echo "Valid environment: ${{ inputs.environment }} ✅"
+
+      - name: Production only with manual trigger
+        if: inputs.environment == 'production' && github.event_name == 'workflow_dispatch'
+        run: echo "Manual production deployment ✅"
+
+# ════════════════════════════════════════════════════════════
+# Real world if: patterns you will use constantly:
+#
+# Only on main:
+#   if: github.ref_name == 'main'
+#
+# Only on version tags:
+#   if: startsWith(github.ref, 'refs/tags/v')
+#
+# Only on release branches:
+#   if: startsWith(github.ref_name, 'release/')
+#
+# Skip ci in commit message:
+#   if: "!contains(github.event.head_commit.message, '[skip-ci]')"
+#
+# Validate environment input:
+#   if: contains(fromJson('["dev","staging","prod"]'), inputs.environment)
+# ════════════════════════════════════════════════════════════

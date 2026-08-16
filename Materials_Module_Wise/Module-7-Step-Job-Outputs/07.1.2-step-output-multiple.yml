@@ -1,0 +1,42 @@
+name: 07.1.2-Step-Output-Multiple
+
+on:
+  workflow_dispatch:
+
+jobs:
+  multiple-outputs-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set multiple outputs
+        id: build-info
+        run: |
+          echo "app-name=i27academy-devops-dashboard" >> $GITHUB_OUTPUT
+          echo "image-tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "build-date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          echo "All outputs have been set"
+
+      - name: Read all outputs
+        run: |
+          echo "============================="
+          echo "BUILD INFORMATION"
+          echo "============================="
+          echo "App Name   : ${{ steps.build-info.outputs.app-name }}"
+          echo "Image Tag  : ${{ steps.build-info.outputs.image-tag }}"
+          echo "Build Date : ${{ steps.build-info.outputs.build-date }}"
+          echo "Branch     : ${{ steps.build-info.outputs.branch }}"
+          echo "============================="
+
+      - name: Use output in docker tag
+        run: |
+          echo "Docker image would be:"
+          echo "devopswithcloudhub/${{ steps.build-info.outputs.app-name }}:${{ steps.build-info.outputs.image-tag }}"
+
+# ════════════════════════════════════════════════════════════
+# Multiple outputs from one step:
+#   echo "key1=value1" >> $GITHUB_OUTPUT
+#   echo "key2=value2" >> $GITHUB_OUTPUT
+#   echo "key3=value3" >> $GITHUB_OUTPUT
+#
+# All outputs share the same step id
+# ════════════════════════════════════════════════════════════

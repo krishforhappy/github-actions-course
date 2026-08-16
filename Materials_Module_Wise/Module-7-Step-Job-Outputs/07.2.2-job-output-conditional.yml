@@ -1,0 +1,69 @@
+name: 07.2.2-Job-Output-Conditional
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  # ── Job 1: Determine what to do ────────────────────────────
+  check:
+    name: Check Branch
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.branch-check.outputs.value }}
+      environment:   ${{ steps.env-check.outputs.value }}
+    steps:
+      - name: Check if this is main branch
+        id: branch-check
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "value=true" >> $GITHUB_OUTPUT
+            echo "Main branch — deploy will run"
+          else
+            echo "value=false" >> $GITHUB_OUTPUT
+            echo "Not main branch — deploy will be skipped"
+          fi
+
+      - name: Set environment based on branch
+        id: env-check
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "value=production" >> $GITHUB_OUTPUT
+          else
+            echo "value=development" >> $GITHUB_OUTPUT
+          fi
+
+  # ── Job 2: Only runs if should-deploy is true ───────────────
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: check
+    if: needs.check.outputs.should-deploy == 'true'   # uses job output in condition
+    steps:
+      - name: Deploy to environment
+        run: |
+          echo "============================="
+          echo "DEPLOYING"
+          echo "============================="
+          echo "Environment : ${{ needs.check.outputs.environment }}"
+          echo "Branch      : ${{ github.ref_name }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "============================="
+
+  # ── Job 3: Always runs — shows the result ──────────────────
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs: check
+    if: always()
+    steps:
+      - name: Print summary
+        run: |
+          echo "Should Deploy : ${{ needs.check.outputs.should-deploy }}"
+          echo "Environment   : ${{ needs.check.outputs.environment }}"
+
+# ════════════════════════════════════════════════════════════
+# Key point:
+#   Job outputs are always strings — even true/false
+#   Compare with == 'true' not == true
+# ════════════════════════════════════════════════════════════

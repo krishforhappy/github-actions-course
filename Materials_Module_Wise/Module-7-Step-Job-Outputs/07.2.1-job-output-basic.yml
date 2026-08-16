@@ -1,0 +1,52 @@
+name: 07.2.1-Job-Output-Basic
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  # ── Job 1: Sets the output ──────────────────────────────────
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:                                        # declare job outputs
+      image-tag: ${{ steps.tag.outputs.value }}
+      app-name:  ${{ steps.app.outputs.value }}
+    steps:
+      - name: Generate image tag
+        id: tag
+        run: |
+          echo "value=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "Image tag set to: ${{ github.sha }}"
+
+      - name: Set app name
+        id: app
+        run: |
+          echo "value=i27academy-devops-dashboard" >> $GITHUB_OUTPUT
+          echo "App name set"
+
+  # ── Job 2: Reads the output ─────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: prepare                                  # must depend on prepare
+    steps:
+      - name: Use job outputs from prepare
+        run: |
+          echo "============================="
+          echo "READING JOB OUTPUTS"
+          echo "============================="
+          echo "App Name  : ${{ needs.prepare.outputs.app-name }}"
+          echo "Image Tag : ${{ needs.prepare.outputs.image-tag }}"
+          echo "============================="
+          echo "Full image: ${{ needs.prepare.outputs.app-name }}:${{ needs.prepare.outputs.image-tag }}"
+
+# ════════════════════════════════════════════════════════════
+# How job outputs work:
+#   1. Step sets output: echo "key=value" >> $GITHUB_OUTPUT
+#   2. Job declares outputs: block pointing to step output
+#   3. Other jobs declare needs: to access it
+#   4. Read via: ${{ needs.JOB_ID.outputs.KEY }}
+#
+# needs: is REQUIRED — without it the job cannot read outputs
+# ════════════════════════════════════════════════════════════
