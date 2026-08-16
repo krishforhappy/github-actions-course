@@ -1,0 +1,61 @@
+name: 11.2.1-Matrix-Include-Exclude
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test - Java ${{ matrix.java-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java-version: [ '17', '21' ]
+        os: [ ubuntu-latest, windows-latest ]
+
+        exclude:
+          # Remove Java 17 on Windows from the matrix
+          - java-version: '17'
+            os: windows-latest
+
+        include:
+          # Add an extra variable to the Java 21 + ubuntu combination
+          - java-version: '21'
+            os: ubuntu-latest
+            is-primary: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Primary combination marker
+        if: matrix.is-primary == true
+        run: |
+          echo "This is the PRIMARY test combination ✅"
+          echo "Java ${{ matrix.java-version }} on ${{ matrix.os }}"
+
+      - name: Show matrix info
+        run: |
+          echo "Java version : ${{ matrix.java-version }}"
+          echo "OS           : ${{ matrix.os }}"
+          echo "Is primary   : ${{ matrix.is-primary }}"
+
+# ════════════════════════════════════════════════════════════
+# After exclude — 3 jobs run (not 4):
+#   Test - Java 17 on ubuntu  ← kept
+#   Test - Java 21 on ubuntu  ← kept (is-primary = true)
+#   Test - Java 21 on windows ← kept
+#   Test - Java 17 on windows ← EXCLUDED
+#
+# include adds an extra variable (is-primary) to a specific
+# matrix combination — does not add a new job
+# ════════════════════════════════════════════════════════════

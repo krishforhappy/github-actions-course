@@ -1,0 +1,41 @@
+name: 11.1.2-Matrix-Multi-Dimension
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test - Java ${{ matrix.java-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java-version: [ '17', '21' ]
+        os: [ ubuntu-latest, windows-latest ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Show matrix combination
+        run: |
+          echo "Java version : ${{ matrix.java-version }}"
+          echo "OS           : ${{ matrix.os }}"
+          echo "Runner OS    : ${{ runner.os }}"
+
+# ════════════════════════════════════════════════════════════
+# This creates 4 parallel jobs (2 java × 2 OS):
+#   Test - Java 17 on ubuntu-latest
+#   Test - Java 17 on windows-latest
+#   Test - Java 21 on ubuntu-latest
+#   Test - Java 21 on windows-latest
+# ════════════════════════════════════════════════════════════
