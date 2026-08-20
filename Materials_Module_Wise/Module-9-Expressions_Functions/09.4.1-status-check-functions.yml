@@ -1,0 +1,74 @@
+name: 09.4.1-Status-Check-Functions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  status-functions-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1 — runs normally
+        run: echo "Step 1 completed successfully"
+
+      - name: Step 2 — fails intentionally
+        run: |
+          echo "This step will fail"
+          exit 1
+        continue-on-error: true     # allow workflow to continue
+
+      - name: Step 3 — success() — skipped because step 2 failed
+        if: success()
+        run: echo "This runs only if all previous steps passed ✅"
+
+      - name: Step 4 — failure() — runs because step 2 failed
+        if: failure()
+        run: echo "A previous step failed — running cleanup or alert ⚠️"
+
+      - name: Step 5 — always() — always runs
+        if: always()
+        run: echo "This always runs — perfect for reports and cleanup ✅"
+
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: status-functions-demo
+    if: failure()                   # job level — only if previous job failed
+    steps:
+      - name: Send alert
+        run: |
+          echo "Job failed — sending notification"
+          echo "Branch  : ${{ github.ref_name }}"
+          echo "Actor   : ${{ github.actor }}"
+
+  final-summary:
+    runs-on: ubuntu-latest
+    needs: [ status-functions-demo, notify-on-failure ]
+    if: always()                    # always runs — even if other jobs failed
+    steps:
+      - name: Write summary
+        run: |
+          echo "## Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| status-functions-demo | ${{ needs.status-functions-demo.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| notify-on-failure | ${{ needs.notify-on-failure.result }} |" >> $GITHUB_STEP_SUMMARY
+
+# ════════════════════════════════════════════════════════════
+# Status check functions:
+#
+#   success()    → runs only if all previous steps/jobs passed
+#                  this is the DEFAULT behaviour
+#
+#   failure()    → runs only if a previous step/job failed
+#                  use for: alerts, cleanup on failure
+#
+#   always()     → runs no matter what
+#                  use for: upload reports, cleanup, summary
+#
+#   cancelled()  → runs only if workflow was cancelled
+#                  rare — use for: notify team of cancellation
+#
+# Jenkins equivalent:
+#   post { always { } }    →  if: always()
+#   post { failure { } }   →  if: failure()
+#   post { success { } }   →  if: success()
+# ════════════════════════════════════════════════════════════

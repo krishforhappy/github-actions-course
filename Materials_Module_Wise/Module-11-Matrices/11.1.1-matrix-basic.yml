@@ -1,0 +1,42 @@
+name: 11.1.1-Matrix-Basic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test - Java ${{ matrix.java-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [ '17', '21' ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Print matrix value
+        run: |
+          echo "============================="
+          echo "Running on Java ${{ matrix.java-version }}"
+          echo "Runner OS   : ${{ runner.os }}"
+          echo "============================="
+
+# ════════════════════════════════════════════════════════════
+# This creates 2 parallel jobs:
+#   Test - Java 17
+#   Test - Java 21
+#
+# Both run at the same time on separate Ubuntu VMs
+# Both must pass for the workflow to succeed
+# ════════════════════════════════════════════════════════════

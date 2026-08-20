@@ -1,0 +1,15 @@
+name: 01-env-variables.yaml
+on: 
+    workflow_dispatch: 
+env:
+    APP_NAME: i27Academy
+    ENVIRONMENT: Dev
+jobs:
+    env-demo:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Print Variables
+        run: |
+          echo "Printing environment Variables"
+          echo "Application Name is: $APP_NAME"
+          echo "Environment Name is: $ENVIRONMENT"

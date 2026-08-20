@@ -1,0 +1,51 @@
+name: 06.3.1-Repository-Variables
+
+# Before running this workflow, create these variables in GitHub:
+# Repo → Settings → Secrets and variables → Actions → Variables tab
+#   APP_NAME    = i27Academy
+#   DEPLOY_ENV  = development
+#   REGISTRY    = docker.io
+
+on:
+  workflow_dispatch:
+
+jobs:
+  variables-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print repository variables
+        run: |
+          echo "============================="
+          echo "REPOSITORY VARIABLES (vars.*)"
+          echo "============================="
+          echo "APP_NAME   : ${{ vars.APP_NAME }}"
+          echo "DEPLOY_ENV : ${{ vars.DEPLOY_ENV }}"
+          echo "REGISTRY   : ${{ vars.REGISTRY }}"
+          echo "============================="
+          echo "Note: values ARE visible in logs — not masked"
+          echo "Use vars.* for non-sensitive config only"
+
+      - name: Compare env vs vars
+        env:
+          ENV_VAR: "I am defined in the YAML file"
+        run: |
+          echo "============================="
+          echo "env: vs vars.*"
+          echo "============================="
+          echo "env var  : $ENV_VAR"
+          echo "vars.*   : ${{ vars.APP_NAME }}"
+          echo "============================="
+          echo "env:   → defined in the YAML file"
+          echo "vars.* → defined in GitHub UI Settings"
+
+# ════════════════════════════════════════════════════════════
+# vars.*  → stored in GitHub UI (Settings → Variables)
+#           plain text — visible in logs
+#           use for: app names, regions, cluster names, URLs
+#           change without touching the YAML file
+#
+# env:    → defined directly in the YAML file
+#           plain text — visible in logs
+#           use for: values specific to this workflow
+#           change requires editing the file
+# ════════════════════════════════════════════════════════════

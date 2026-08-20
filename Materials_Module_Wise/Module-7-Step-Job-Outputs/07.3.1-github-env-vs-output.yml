@@ -1,0 +1,63 @@
+name: 07.3.1-GITHUB-ENV-vs-OUTPUT
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  # ── Job 1: Demonstrates both ───────────────────────────────
+  job-one:
+    name: Job One
+    runs-on: ubuntu-latest
+    outputs:
+      output-value: ${{ steps.set-output.outputs.value }}   # exposed via outputs:
+    steps:
+      - name: Set via GITHUB_ENV
+        run: |
+          echo "ENV_VALUE=set-via-github-env" >> $GITHUB_ENV
+          echo "GITHUB_ENV value set"
+
+      - name: Read GITHUB_ENV in same job
+        run: |
+          echo "ENV_VALUE is: $ENV_VALUE"    # works — same job
+
+      - name: Set via GITHUB_OUTPUT
+        id: set-output
+        run: |
+          echo "value=set-via-github-output" >> $GITHUB_OUTPUT
+          echo "GITHUB_OUTPUT value set"
+
+  # ── Job 2: Can only read GITHUB_OUTPUT ─────────────────────
+  job-two:
+    name: Job Two
+    runs-on: ubuntu-latest
+    needs: job-one
+    steps:
+      - name: Try to read GITHUB_ENV from job-one
+        run: |
+          echo "ENV_VALUE from job-one : $ENV_VALUE"
+          echo "Above is EMPTY — GITHUB_ENV does not cross jobs"
+
+      - name: Read GITHUB_OUTPUT from job-one
+        run: |
+          echo "Output from job-one : ${{ needs.job-one.outputs.output-value }}"
+          echo "Above works — GITHUB_OUTPUT crosses jobs via outputs:"
+
+# ════════════════════════════════════════════════════════════
+# Summary:
+#
+#   $GITHUB_ENV
+#     → echo "KEY=value" >> $GITHUB_ENV
+#     → available to NEXT STEPS in the SAME JOB
+#     → does NOT cross job boundaries
+#
+#   $GITHUB_OUTPUT
+#     → echo "key=value" >> $GITHUB_OUTPUT
+#     → available to OTHER JOBS via needs.JOB.outputs.KEY
+#     → job must declare outputs: block
+#     → reading job must declare needs:
+#
+#   Rule:
+#     GITHUB_ENV    = talking to steps in THIS job
+#     GITHUB_OUTPUT = talking to OTHER jobs
+# ════════════════════════════════════════════════════════════

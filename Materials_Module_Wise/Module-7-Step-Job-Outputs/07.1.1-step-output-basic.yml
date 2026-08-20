@@ -1,0 +1,31 @@
+name: 07.1.1-Step-Output-Basic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  step-output-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set a step output
+        id: my-step                    # id is required to reference this step
+        run: |
+          echo "message=Hello from Step Output" >> $GITHUB_OUTPUT
+          echo "Output has been set"
+
+      - name: Read the step output
+        run: |
+          echo "============================="
+          echo "READING STEP OUTPUT"
+          echo "============================="
+          echo "Message : ${{ steps.my-step.outputs.message }}"
+          echo "============================="
+
+# ════════════════════════════════════════════════════════════
+# How step outputs work:
+#   1. Give the step an id:
+#   2. Write to $GITHUB_OUTPUT: echo "key=value" >> $GITHUB_OUTPUT
+#   3. Read in later steps: ${{ steps.STEP_ID.outputs.KEY }}
+#
+# id: is REQUIRED — without it you cannot reference the step
+# ════════════════════════════════════════════════════════════

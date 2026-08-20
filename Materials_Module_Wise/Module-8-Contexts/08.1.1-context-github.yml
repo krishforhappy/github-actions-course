@@ -1,0 +1,35 @@
+name: 08.1.1-Context-Github
+
+on:
+  workflow_dispatch:
+
+jobs:
+  github-context-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print github.* context
+        run: |
+          echo "============================="
+          echo "github.* CONTEXT"
+          echo "============================="
+          echo "Repository     : ${{ github.repository }}"
+          echo "Ref Name       : ${{ github.ref_name }}"
+          echo "Ref            : ${{ github.ref }}"
+          echo "SHA            : ${{ github.sha }}"
+          echo "Actor          : ${{ github.actor }}"
+          echo "Event Name     : ${{ github.event_name }}"
+          echo "Workflow       : ${{ github.workflow }}"
+          echo "Job            : ${{ github.job }}"
+          echo "Run ID         : ${{ github.run_id }}"
+          echo "Run Number     : ${{ github.run_number }}"
+          echo "Workspace      : ${{ github.workspace }}"
+          echo "============================="
+
+      - name: Dump full github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "============================="
+          echo "FULL GITHUB CONTEXT (JSON)"
+          echo "============================="
+          echo "$GITHUB_CONTEXT"

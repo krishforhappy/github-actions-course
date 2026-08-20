@@ -1,0 +1,31 @@
+name: Status Check Functions Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  status-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Step 1 - Build
+        run: |
+          echo "Building application..."
+          exit 1
+
+      - name: Step 2 - Success
+        if: ${{ success() }}
+        run: echo "Previous steps are successful"
+
+      - name: Step 3 - Failure
+        if: ${{ failure() }}
+        run: echo "A previous step has failed"
+
+      - name: Step 4 - Always
+        if: ${{ always() }}
+        run: echo "I will run regardless of success or failure"
+
+      - name: Step 5 - Cancelled
+        if: ${{ cancelled() }}
+        run: echo "Workflow was cancelled"

@@ -1,0 +1,85 @@
+name: 08.1.6-Inputs-Workflow-Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment to deploy
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+        default: development
+
+      version:
+        description: Version to deploy (e.g. v1.0.0)
+        required: false
+        type: string
+        default: 'v1.0.0'
+
+      skip-tests:
+        description: Skip tests? Use only in emergencies
+        required: false
+        type: boolean
+        default: false
+
+      replicas:
+        description: Number of replicas to deploy
+        required: false
+        type: number
+        default: 1
+
+jobs:
+  inputs-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print all inputs
+        run: |
+          echo "============================="
+          echo "WORKFLOW DISPATCH INPUTS"
+          echo "============================="
+          echo "Environment : ${{ inputs.environment }}"
+          echo "Version     : ${{ inputs.version }}"
+          echo "Skip Tests  : ${{ inputs.skip-tests }}"
+          echo "Replicas    : ${{ inputs.replicas }}"
+          echo "============================="
+
+      - name: Use choice input in condition
+        if: inputs.environment == 'production'
+        run: echo "Production deployment ✅"
+
+      - name: Use boolean input in condition
+        if: inputs.skip-tests == false
+        run: echo "Running tests — skip-tests is false ✅"
+
+      - name: Use string input
+        run: |
+          echo "Deploying version : ${{ inputs.version }}"
+
+      - name: Use number input
+        run: |
+          echo "Deploying ${{ inputs.replicas }} replica(s)"
+
+# ════════════════════════════════════════════════════════════
+# Input types:
+#   string  → free text input
+#   boolean → true/false checkbox
+#   choice  → dropdown with predefined options
+#   number  → numeric value
+#
+# Input properties:
+#   description → shown in the GitHub UI
+#   required    → true = must provide, false = optional
+#   default     → value used when not provided
+#   type        → string, boolean, choice, number
+#
+# Accessing inputs:
+#   ${{ inputs.INPUT_NAME }}
+#
+# Important:
+#   boolean inputs compare as: inputs.skip-tests == false
+#   NOT as: inputs.skip-tests == 'false'
+#   choice and string compare with single quotes: inputs.environment == 'production'
+# ════════════════════════════════════════════════════════════

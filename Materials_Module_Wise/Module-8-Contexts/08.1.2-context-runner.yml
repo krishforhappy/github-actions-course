@@ -1,0 +1,33 @@
+name: 08.1.2-Context-Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  runner-context-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print runner.* context
+        run: |
+          echo "============================="
+          echo "runner.* CONTEXT"
+          echo "============================="
+          echo "OS         : ${{ runner.os }}"
+          echo "Arch       : ${{ runner.arch }}"
+          echo "Name       : ${{ runner.name }}"
+          echo "Temp       : ${{ runner.temp }}"
+          echo "Tool Cache : ${{ runner.tool_cache }}"
+          echo "============================="
+
+      - name: Conditional step based on OS
+        if: runner.os == 'Linux'
+        run: echo "This step only runs on Linux ✅"
+
+      - name: Dump full runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: |
+          echo "============================="
+          echo "FULL RUNNER CONTEXT (JSON)"
+          echo "============================="
+          echo "$RUNNER_CONTEXT"

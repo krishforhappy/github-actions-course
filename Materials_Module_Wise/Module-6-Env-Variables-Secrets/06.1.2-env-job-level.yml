@@ -1,0 +1,32 @@
+name: 02-Job-Level-Variables
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  dev-job:
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: dev
+      APP_NAME: i27Academy-dev-app
+
+    steps:
+      - name: Print Variables
+        run: |
+          echo "Application : $APP_NAME"
+          echo "Environment : $ENVIRONMENT"
+
+  prod-job:
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: prod
+      APP_NAME: i27Academy-prod-app
+
+    steps:
+      - name: Print Variables
+        run: |
+          echo "Application : $APP_NAME"
+          echo "Environment : $ENVIRONMENT"

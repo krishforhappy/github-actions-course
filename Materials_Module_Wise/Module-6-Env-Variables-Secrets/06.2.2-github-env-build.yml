@@ -1,0 +1,25 @@
+name: 06-github-env-build-example
+on: workflow_dispatch
+jobs:
+  build-env-job:
+    runs-on:  ubuntu-latest
+    steps:
+    - name: Set Env variables 
+      run: |
+        echo "BUILD_VERSION_ID=${{ github.run_id}}" >> $GITHUB_ENV
+        echo "BUILD_VERSION_NUMBER=${{ github.run_number}}" >> $GITHUB_ENV
+    - name: Use build version 
+      run: |
+        echo "Build Version id is: $BUILD_VERSION_ID"
+        echo "Build Version Number is: $BUILD_VERSION_NUMBER"
+  second-job:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Print GITHUB_ENV from diff job
+        run: |
+            echo "***************** Printing $GITHUB_ENV from differnt  $GITHUB_ENV"
+            echo "Build Version id is: $BUILD_VERSION_ID"
+            echo "Build Version Number is: $BUILD_VERSION_NUMBER"
+
+# GITHUB_ENV is applicable in same job, doensbot caryforeward in differnt job 
+

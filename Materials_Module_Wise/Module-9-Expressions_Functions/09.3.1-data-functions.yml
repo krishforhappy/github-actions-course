@@ -1,0 +1,59 @@
+name: 09.3.1-Data-Functions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  data-functions-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: toJson()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: |
+          echo "============================="
+          echo "toJson() — converts object to JSON string"
+          echo "============================="
+          echo "Runner context:"
+          echo "$RUNNER_CONTEXT"
+          echo "============================="
+
+      - name: fromJson()
+        run: |
+          echo "============================="
+          echo "fromJson() — parses JSON string into object"
+          echo "============================="
+          echo "Valid env check: ${{ contains(fromJson('["development","staging","production"]'), 'development') }}"
+          echo "============================="
+
+      - name: hashFiles()
+        run: |
+          echo "============================="
+          echo "hashFiles() — generates hash of file contents"
+          echo "============================="
+          echo "pom.xml hash     : ${{ hashFiles('pom.xml') }}"
+          echo "all yaml hash    : ${{ hashFiles('**/*.yml') }}"
+          echo "============================="
+          echo "Used for cache keys — if pom.xml changes, cache is invalidated"
+
+# ════════════════════════════════════════════════════════════
+# Data functions:
+#
+# toJson(value)
+#   → converts any context or object to a JSON string
+#   → ALWAYS assign to env var first — never put in run: directly
+#
+# fromJson(string)
+#   → parses a JSON string into an object
+#   → used with contains() to check membership
+#   → used for dynamic matrix (Module 11)
+#
+# hashFiles(path)
+#   → generates a hash based on file contents
+#   → used as cache keys — cache invalidates when files change
+#   → covered in depth in Module 10 — Artifacts and Caching
+# ════════════════════════════════════════════════════════════
